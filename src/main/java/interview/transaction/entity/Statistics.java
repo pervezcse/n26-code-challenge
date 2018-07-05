@@ -1,5 +1,7 @@
 package interview.transaction.entity;
 
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +15,24 @@ public class Statistics {
   private final Double max;
   private final Double min;
   private final Long count;
-  
+
   public static StatisticsBuilder builder(Transaction transaction) {
     return new StatisticsBuilder(transaction);
   }
-  
+
+  /**
+   * 
+   * @param transactions
+   * @return
+   */
+  public static StatisticsBuilder builder(List<Transaction> transactions) {
+    StatisticsBuilder sb = new StatisticsBuilder();
+    for (Transaction transaction : transactions) {
+      sb = sb.transaction(transaction);
+    }
+    return sb;
+  }
+
   public static Statistics getNullInstance() {
     return new StatisticsBuilder().build();
   }
@@ -37,7 +52,7 @@ public class Statistics {
       this.max = 0.0;
       this.min = 0.0;
     }
-    
+
     private StatisticsBuilder(Transaction transaction) {
       this.sum = transaction.getAmount();
       this.count = 1L;
@@ -48,7 +63,9 @@ public class Statistics {
 
     /**
      * Update statistics using transaction data.
-     * @param transaction data for updating statistics
+     * 
+     * @param transaction
+     *          data for updating statistics
      * @return
      */
     public StatisticsBuilder transaction(Transaction transaction) {
@@ -62,7 +79,9 @@ public class Statistics {
 
     /**
      * Update statistics using other statistics data.
-     * @param statistics data for updating this statistics data
+     * 
+     * @param statistics
+     *          data for updating this statistics data
      * @return
      */
     public StatisticsBuilder statistics(Statistics statistics) {

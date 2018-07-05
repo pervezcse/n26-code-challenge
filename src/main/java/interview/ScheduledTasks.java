@@ -17,7 +17,8 @@ public class ScheduledTasks {
   /**
    * Scheduled cleanup for preventing statistics repository from being too big.
    */
-  @Scheduled(fixedDelay = 3 * 60 * 1000, initialDelay = 3 * 60 * 1000)
+//  @Scheduled(fixedDelay = 3 * 60 * 1000, initialDelay = 3 * 60 * 1000)
+  @Scheduled(fixedDelay = 1000, initialDelay = 1000)
   public void reportCurrentTime() {
     Long currentTimeStamp = System.currentTimeMillis();
     Long fromTileStamp = currentTimeStamp - 5 * 60 * 1000;

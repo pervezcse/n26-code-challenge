@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import interview.TransactionServiceApplication;
 import interview.transaction.entity.Statistics;
-import interview.transaction.entity.Statistics.StatisticsBuilder;
 import interview.transaction.entity.Transaction;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,18 +40,16 @@ public class IntegrationTest {
         .mapToObj(a -> new Transaction((double) a, System.currentTimeMillis()))
         .collect(Collectors.toList());
     assertThat(txList.size()).isEqualTo(10);
-    StatisticsBuilder statisticsBuilder = Statistics.builder(txList.get(0));
-    txList.subList(1, txList.size()).stream().forEach(tx -> statisticsBuilder.transaction(tx));
-    Statistics stat = statisticsBuilder.build();
+    Statistics stat = Statistics.builder(txList).build();
     for (Transaction tx : txList) {
       createTransaction(tx);
     }
     mvc.perform(MockMvcRequestBuilders.get("/statistics").contentType(APPLICATION_JSON))
-        .andExpect(status().isOk()).andExpect(jsonPath("$.sum", is(stat.getSum())))
-        .andExpect(jsonPath("$.avg", is(stat.getAvg())))
+        .andExpect(status().isOk()).andExpect(jsonPath("sum", is(stat.getSum())))
+        .andExpect(jsonPath("avg", is(stat.getAvg())))
         .andExpect(jsonPath("max", is(stat.getMax())))
-        .andExpect(jsonPath("$.min", is(stat.getMin())))
-        .andExpect(jsonPath("$.count", is(stat.getCount().intValue()))).andDo(print());
+        .andExpect(jsonPath("min", is(stat.getMin())))
+        .andExpect(jsonPath("count", is(stat.getCount().intValue()))).andDo(print());
   }
 
   private void createTransaction(Transaction tx) throws Exception {

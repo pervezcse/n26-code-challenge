@@ -8,9 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import interview.controller.StatisticsController;
 import interview.transaction.entity.Statistics;
-import interview.transaction.entity.Statistics.StatisticsBuilder;
 import interview.transaction.entity.Transaction;
 import interview.transaction.service.StatisticsService;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import javax.annotation.Resource;
 import org.junit.Test;
@@ -34,11 +35,10 @@ public class StatisticsControllerTest {
   public void givenMultipleTransactionsInLast60Seconds_whenGetStatistics_thenReturnStatistics()
       throws Exception {
 
-    StatisticsBuilder statisticsBuilder = Statistics
-        .builder(new Transaction(0.0, System.currentTimeMillis()));
-    LongStream.range(1, 10).forEach(
-        a -> statisticsBuilder.transaction(new Transaction((double)a, System.currentTimeMillis())));
-    Statistics stat = statisticsBuilder.build();
+    List<Transaction> txList = LongStream.range(0, 10)
+        .mapToObj(a -> new Transaction((double) a, System.currentTimeMillis()))
+        .collect(Collectors.toList());
+    Statistics stat = Statistics.builder(txList).build();
     given(service.getStatistics()).willReturn(stat);
     mvc.perform(MockMvcRequestBuilders.get("/statistics").contentType(APPLICATION_JSON))
         .andExpect(status().isOk()).andExpect(jsonPath("$.sum", is(stat.getSum())))
